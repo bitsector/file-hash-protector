@@ -30,11 +30,11 @@ unsigned char* hash_a_file(unsigned char* hash_dst,const char* path){
 	file_contents = get_file(path,&contents_len);
 
 	if (!file_contents){
-		LOGE("opening file: %s failed\r\n",path); 
+		LOGE("opening file: %s failed",path); 
 		return NULL;
 	}
 
-	//LOGS("file contents: %s, len: %d\r\n",file_contents,contents_len); 
+	//LOGS("file contents: %s, len: %d",file_contents,contents_len); 
 	hash_buffer(hash_dst,file_contents,contents_len);
 	
 	free(file_contents);
@@ -136,8 +136,16 @@ int add_file_to_hash_list(const char* path){
 	}
 	
 	if (is_in_file(HASH_FILE_PATH,path)){
-		LOGE("path already in file\r\n");
-		return -1;	
+		LOGE("path already in file, will calculate hash anew");
+		
+		res = remove_path_from_hash_list(path);
+		
+		if (res < 0){
+			LOGE("could not remove existing file %s entry from file even though it's there");
+			return -1;	
+		
+		}
+		
 	}
 
 	rc = get_path_and_hash_line(path,new_hash_line);
@@ -146,19 +154,14 @@ int add_file_to_hash_list(const char* path){
 		LOGE("get_path_and_hash_line() failed\r\n");
 		return -1;	
 	}
-	/*
-	LOG("new path and hash line is: %s",new_hash_line);
-	LOG("no# of bites to write %d",strlen(path)+SHA512_HEX_DIGEST_LENGTH+4);
-	LOG("strlen(path) %d",strlen(path));
-	LOG("sizeof(new_hash_line) %d",sizeof(new_hash_line));
-	*/
+	
 	res = append_to_file(HASH_FILE_PATH,path,new_hash_line);
 	
 	if (res<0){
 		LOGE("append_to_file() failed\r\n");
 		return -1;	
 	}
-	
+
 	return 0;
 }
 // tested
@@ -209,7 +212,7 @@ unsigned char* get_hash_of_file_from_list(const char* path, unsigned char* store
 	return stored_hash;
 	
 }
-// TODO - test this
+//tested
 int remove_path_from_hash_list(const char* path){
 	size_t len = 0;
 	char* hash_file_buffer = NULL;
@@ -241,21 +244,26 @@ int remove_path_from_hash_list(const char* path){
 		return -1;
 	}
 	
-	new_file_buffer = (char*)calloc(0,len - strlen(path) - SHA512_HEX_DIGEST_LENGTH - 3);
+	new_file_buffer = (char*)malloc( sizeof(char)*(len - (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4) +1) );
 	
 	if (!new_file_buffer){
 		LOGE("could not allocate new buffer, out of memory\r\n");
 		free(hash_file_buffer);
 		return -1;
 	}
+	LOGS("new_file_buffer allocation size: %d, times sizeof: %d",
+		(len - (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4)),
+		sizeof(char)*(len - (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4)));
+		
+	memset(new_file_buffer,0,sizeof(char)*(len - (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4)+1));
 	
 	while (hash_file_buffer + i < path_start){
 		new_file_buffer[i] = hash_file_buffer[i];
 		i++;
 	};
 		
-	while ( i + ( strlen(path) + SHA512_HEX_DIGEST_LENGTH + 3) < len){
-		new_file_buffer[i] = hash_file_buffer[i + (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 3)];
+	while ( i + ( strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4) < len){
+		new_file_buffer[i] = hash_file_buffer[i + (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4)-1];
 		i++;
 	};
 	
@@ -264,8 +272,8 @@ int remove_path_from_hash_list(const char* path){
 
 	write_to_file(HASH_FILE_PATH,new_file_buffer);
 	
-//	free(new_file_buffer);
-//	free(hash_file_buffer);
+	free(new_file_buffer);
+	free(hash_file_buffer);
 
 	return 0;
 	

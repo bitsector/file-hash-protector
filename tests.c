@@ -199,14 +199,18 @@ void test_is_in_file(){
 	LOG ("is \"dd\" in file: %d\r\n",is_in_file(HASH_FILE_PATH,"dd"));
 }
 void test_add_file_to_hash_list_w_dups(){
+	size_t len = 0;
 	reset_hash_file(); 
+	write_to_file(TEST_FILE_1_PATH,"goo1111111\n");
 	add_file_to_hash_list(TEST_FILE_1_PATH);
+	write_to_file(TEST_FILE_1_PATH,"foo111\n");
 	add_file_to_hash_list(TEST_FILE_1_PATH);
 	add_file_to_hash_list(TEST_FILE_2_PATH);
+	write_to_file(TEST_FILE_1_PATH,"987655\n");
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	write_to_file(TEST_FILE_2_PATH,"12345\n");
 	add_file_to_hash_list(TEST_FILE_2_PATH);
-	add_file_to_hash_list(TEST_FILE_3_PATH);
-	add_file_to_hash_list(TEST_FILE_2_PATH);
-	
+
 	
 }
 void test_get_hash_of_file_from_list(){
@@ -276,7 +280,39 @@ void test_remove_path_from_hash_list(){
 	add_file_to_hash_list(TEST_FILE_1_PATH);
 	LOG("remove_path_from_hash_list(TEST_FILE_3_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_3_PATH));// should fail
 	LOG("remove_path_from_hash_list(TEST_FILE_2_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_2_PATH));// should succeed
-//	LOG("remove_path_from_hash_list(TEST_FILE_1_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_1_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_1_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_1_PATH));// should succeed
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	LOG("remove_path_from_hash_list(TEST_FILE_1_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_1_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_2_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_2_PATH));// should succeed
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	LOG("remove_path_from_hash_list(TEST_FILE_2_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_2_PATH));// should succeed
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	LOG("remove_path_from_hash_list(TEST_FILE_2_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_2_PATH));// should succeed
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	add_file_to_hash_list(TEST_FILE_3_PATH);
+	LOG("remove_path_from_hash_list(TEST_FILE_1_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_1_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_2_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_2_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_3_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_3_PATH));// should succeed
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	add_file_to_hash_list(TEST_FILE_3_PATH);
+	LOG("remove_path_from_hash_list(TEST_FILE_3_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_3_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_2_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_2_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_1_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_1_PATH));// should succeed
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	add_file_to_hash_list(TEST_FILE_3_PATH);
+	LOG("remove_path_from_hash_list(TEST_FILE_2_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_2_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_3_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_3_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_1_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_1_PATH));// should succeed
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	add_file_to_hash_list(TEST_FILE_3_PATH);
+	LOG("remove_path_from_hash_list(TEST_FILE_2_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_2_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_1_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_1_PATH));// should succeed
+	LOG("remove_path_from_hash_list(TEST_FILE_3_PATH): %d\r\n",remove_path_from_hash_list(TEST_FILE_3_PATH));// should succeed
 	
 }
 void test_logging_macro(){
@@ -371,18 +407,18 @@ void run_all_tests(){
 	//test_write_to_file();
 	//test_reset_hash_file();
 	//test_is_in_file();
-	//test_add_file_to_hash_list_w_dups();
+	test_add_file_to_hash_list_w_dups();
 	//test_get_hash_of_file_from_list();
 	//test_get_dir_from_path();
 	//test_is_path_in_hash_file();
 	//test_is_dir_path();
 	//test_logging_macro();
 	//test_hash_a_file_as_hex();
-	test_finallize();
+	//test_finallize();
+	//test_remove_path_from_hash_list();
 	
 	//test_string_stuff();
 	//test_get_line_num_in_file();
-	//test_remove_path_from_hash_list();
 	//test_printf_anomaly();
 }
 

@@ -134,9 +134,6 @@ static void print_event(struct inotify_event *event){
     LOG("name: %s",event->name);
 
 }
-int check_hashes_on_boot(){
-	
-}
 static char* dir_path_only(int wd){
 	int i=0;
 	while (i<num_watched_dirs){
@@ -178,8 +175,6 @@ static int handle_event(struct inotify_event* event){
 	if (is_in_file(HASH_FILE_PATH,entire_path)){
 		
 		// here compare hash of current file with the one in hash file
-		LOGS("hash comparison!!",entire_path);
-		
 		
 		res = get_hash_of_file_from_list(entire_path,stored_hash);
 		
@@ -188,7 +183,6 @@ static int handle_event(struct inotify_event* event){
 			return -1;
 		}
 		
-		// TODO - this is a problem, it's not the right functions
 		res = hash_a_file_as_hex(fresh_hash,entire_path);
 		if (!res){
 			LOGE("could not calculate hash of %s contents, maybe we don't have access?");
@@ -230,11 +224,15 @@ static int parse_events(int length){
 					handle_event(event);
 				}
 			}else if ( event->mask & IN_DELETE ) {
+				// TODO - what should happen if a dir or a file
+				// are deleted?
+				// Should I norify about that and that's it?
 				if ( event->mask & IN_ISDIR ) {
 					LOG( "event is IN_MODIFY on dir" );
 				}
 				else {
 					LOG( "event is IN_MODIFY on dir" );
+					
 				}
 			}
 		}
@@ -303,10 +301,10 @@ static int add_watches(){
 		return -1;
 	}
 
-	paths_array = malloc(sizeof(struct wd_dir_pair)*num_paths);
+	paths_array = (char*)malloc(	sizeof(struct wd_dir_pair)*num_paths);
 	
 	if (!paths_array){
-		LOGE("calloc failed, out of memory");
+		LOGE("malloc failed, out of memory");
 		finalize();
 		return -1;
 	}
@@ -325,11 +323,13 @@ static int add_watches(){
 		LOG("path: %s, wd: %d",paths_array[i].dir_path,paths_array[i].wd);
 		num_watched_dirs++;
 	}
+	/*	
 	res = check_hashes_on_boot();
 	
 	if (res != 0){
 		LOG("boot hash check failed! some files must have chaned");
 	}
+	*/
 	LOGS("success! num_paths: %d, num_watched_dirs %d, allocated: %d",num_paths,num_watched_dirs,sizeof(struct wd_dir_pair)*num_paths);
 	return 0;
 }

@@ -111,8 +111,8 @@ char* get_file(const char* file_path,size_t *len){
 	return buffer;
 
 }
-// TODO - works incorrectly
 
+// TODO - works incorrectly
 int append_to_file(const char* append_to_path,const char* target_path,const char* data){
 	FILE* f_ptr = NULL;
 	size_t res = 0;
@@ -144,64 +144,19 @@ int append_to_file(const char* append_to_path,const char* target_path,const char
 	//fwrite(data,strlen(target_path)+SHA512_HEX_DIGEST_LENGTH+4,1,f_ptr);
 	
 	LOGS("written: %d",res)
+	LOGS("written content: %s",data)
 	
 	fclose(f_ptr);
 	
 	return 0;
 }
-/*
-int append_to_file(const char* path,const char* data){
-	size_t len;
-	char* file_buffer = NULL;
-	char* ex_file_buffer = NULL;
-	int res = 0;
-	if (!path || !does_exist(path)){
-		LOGE("invalid path: %s\r\n", path);
-		return -1;	
-	}
-	
-	file_buffer = get_file(path,&len);
-
-	if (!file_buffer){
-		LOGE("could not original file: %s\r\n", path);
-		return -1;	
-	}
-
-	ex_file_buffer = realloc(file_buffer,len+(strlen(path)+SHA512_HEX_DIGEST_LENGTH+4));
-	
-	if (!ex_file_buffer){
-		LOGE("could not realloc(), out of memory\r\n");
-		free(file_buffer);
-		return -1;	
-	}
-	LOG("data to add: %s",data);
-	LOG("ex_file_buffer before write: %s",ex_file_buffer);
-	
-	
-	snprintf(ex_file_buffer+len,(strlen(path)+SHA512_HEX_DIGEST_LENGTH+4),"%s",data);
-	
-	LOG("ex_file_buffer after write: %s",ex_file_buffer);
-
-	LOG("%s before write:");
-	print_file(path);
-
-	res = write_to_file(path,ex_file_buffer);
-	
-	LOG("%s after write:");
-	print_file(path);
-	
-	free(ex_file_buffer);
-	
-	return 0;
-}
-*/
 
 // tested
 int write_to_file(const char* path,const char* buffer){
 	FILE * fp;
-	int i;
+	int res = 0;
 	if (!path || !buffer){
-		LOGE("invalid argument\r\n", path);
+		LOGE("invalid argument\r\n");
 		return -1;
 	}
 
@@ -212,8 +167,17 @@ int write_to_file(const char* path,const char* buffer){
 		return -1;
 	}
 
-	fprintf(fp,buffer);
+	res = fprintf(fp,buffer);
 
+	if (res < 0){
+		LOGE("failed to write: %s",strerror(errno));
+		fclose (fp);
+		return -1;
+	}
+	
+	//LOGS("written: %d characters",res);
+	//LOGS("written: content %s",buffer);
+	
 	fclose (fp);
 	
 	return 0;
@@ -231,6 +195,7 @@ int is_in_file(const char* path,const char* needle){
 	}
 
 	file_buff = get_file(path,&len);
+
 	if (!file_buff){
 		LOGE("get_file() failed\r\n");
 		return -1;
