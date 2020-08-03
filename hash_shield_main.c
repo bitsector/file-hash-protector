@@ -52,7 +52,25 @@ void reset(){
 		printf("%s() failed\r\n",__func__);
 	}
 }
+// TODO - test this
+static int check_hash_storage(){
+	int res = 0;
+	if (!does_exist(HASH_FILE_PATH)){
+		LOGE("hash storage file does not exist! attempting to create...");
+		res = write_to_file(HASH_FILE_PATH,"");
+		if (res == -1){
+			LOGE("could not create hash storage %s, is the program runnign with the right permissions?");
+			return -1;
+		}
+	}
+	return 0;
+}
 int main(int argc, char* argv[]){
+	if (check_hash_storage() == -1){
+		LOGE("could not get hash storage!!");
+		return -1;
+	}
+	
 	if (argc == 2){
 		if (strncmp(argv[1],"--help",sizeof("--help")) == 0){
 			usage();

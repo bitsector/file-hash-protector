@@ -18,7 +18,7 @@
 
 #define SHA512_HEX_DIGEST_LENGTH (2*SHA512_DIGEST_LENGTH)
 
-#define HASH_FILE_PATH "/etc/hash" // TODO - obfuscate
+#define HASH_FILE_PATH "/etc/hs_hash_storage" // TODO - obfuscate
 #define TEST_FILE_1_PATH "/home/ak/mmn16/test_files/test_file_1" // TODO - obfuscate
 #define TEST_FILE_2_PATH "/home/ak/mmn16/test_files/test_file_2" // TODO - obfuscate
 #define TEST_FILE_3_PATH "/home/ak/mmn16/test_files/test_file_3" // TODO - obfuscate
