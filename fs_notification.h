@@ -4,6 +4,7 @@
 #include "hash_shield.h"
 #include "util.h"
 
+void stop_fs_notifications();
 int run_inotify();
 
 #endif  // HS_INOTIFY_H

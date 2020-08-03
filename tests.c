@@ -357,6 +357,9 @@ void test_hash_a_file_as_hex(){
 	LOGS("%s",hex_hash_long);
 
 }
+void test_finallize(){
+	stop_fs_notifications();
+}
 void run_all_tests(){
 	//test_get_file();
 	//test_sha_basics();
@@ -374,9 +377,10 @@ void run_all_tests(){
 	//test_is_path_in_hash_file();
 	//test_is_dir_path();
 	//test_logging_macro();
+	//test_hash_a_file_as_hex();
+	test_finallize();
 	
 	//test_string_stuff();
-	test_hash_a_file_as_hex();
 	//test_get_line_num_in_file();
 	//test_remove_path_from_hash_list();
 	//test_printf_anomaly();

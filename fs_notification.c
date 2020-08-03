@@ -22,6 +22,30 @@ struct wd_dir_pair{
 // an array containing all the paths of watched dir and their corresponding wds
 static struct wd_dir_pair* paths_array = NULL;
 
+// tested
+// free all allocated memory in fs_notification.c
+static void finalize(){
+	if (paths_array) {
+		for ( int i = 0  ; i < num_watched_dirs ; i++ ){
+			if ( paths_array[i].wd != -1 ){
+				inotify_rm_watch(inotify_fd,paths_array[i].wd);
+			}
+		}
+		free(paths_array);
+		paths_array = NULL;
+	}
+	if (inotify_fd){
+		close(inotify_fd);
+		inotify_fd = 0;
+	}
+}
+// tested
+// stop getting notifications form inotify mechanism
+void stop_fs_notifications(){
+    LOG("stopping all inotify operations and releasing resources");
+	finalize();
+}
+
 static const char* get_exact_event_mask(unsigned int mask){
     switch(mask){
         case (IN_ACCESS):
@@ -250,7 +274,7 @@ static int fill_with_paths(){
 		if (!res){
 			LOGE("could not get dir from path: %s",curr_path);
 			free(hash_file_buffer);
-			// TODO - finalize
+			finalize();
 			return -1;
 		}
 		LOG("curr_dir_only: %s",curr_dir_only);
@@ -283,7 +307,7 @@ static int add_watches(){
 	
 	if (!paths_array){
 		LOGE("calloc failed, out of memory");
-		// TODO - finalize
+		finalize();
 		return -1;
 	}
 	
@@ -295,7 +319,7 @@ static int add_watches(){
 		paths_array[i].wd = inotify_add_watch( inotify_fd, paths_array[i].dir_path, EVENT_MASK);
 		if (paths_array[i].wd == -1){
 			LOGE("inorify_add_watch on %s failed!",paths_array[i].dir_path);	
-			// TODO - finalize
+			finalize();
 			return -1;
 		}
 		LOG("path: %s, wd: %d",paths_array[i].dir_path,paths_array[i].wd);
@@ -340,7 +364,7 @@ int run_inotify(){
 		
 		if (res < 0){
 			LOGE("event parsing failed");
-			// TODO - finalize
+			finalize();
 			return -1;
 		}
 		
