@@ -278,3 +278,86 @@ int remove_path_from_hash_list(const char* path){
 	return 0;
 	
 }
+int check_all_existing_hashes(){
+	size_t len = 0;
+	int num_paths = 0;
+	char curr_path[PATH_MAX+1] = {0};
+	char stored_hex_hash[SHA512_HEX_DIGEST_LENGTH+1] = {0};
+	char curr_hex_hash[SHA512_HEX_DIGEST_LENGTH+1] = {0};
+	char* hash_file_buffer = NULL;
+	char* line_start = NULL;
+	char* next_break = NULL;
+	char* res = NULL;
+	int i = 0;
+
+	num_paths = get_line_num_in_file(HASH_FILE_PATH);
+
+	if (num_paths == 0){
+		LOGE("no files to watch");
+		return -1;
+	}else if (num_paths < 0){
+		LOGE("error getting paths");
+		return -1;
+	}
+
+	
+	hash_file_buffer = get_file(HASH_FILE_PATH,&len);
+	
+	if (!hash_file_buffer){
+		LOGE("could not get hash file");
+		return 0;
+	}
+	
+	
+	
+		// go over all paths and get their dir
+	line_start = hash_file_buffer;
+	next_break = strstr(line_start,":");
+	while( i < num_paths){ // in effect num lines
+		memset(curr_path,0,sizeof(curr_path));
+		memset(stored_hex_hash,0,sizeof(stored_hex_hash));
+		memset(curr_hex_hash,0,sizeof(curr_hex_hash));
+		strncpy(curr_path,line_start,next_break-line_start);
+		LOG("curr_path: %s",curr_path);
+		strncpy(stored_hex_hash,next_break+1,SHA512_HEX_DIGEST_LENGTH);
+		LOG("it's stored hash: %s",stored_hex_hash);
+		rc = hash_a_file_as_hex(curr_hex_hash,curr_path);
+
+		if (!rc){
+			LOGE("could not calculate hash as hex for: %s",curr_path);
+			free(hash_file_buffer);
+			return -1
+		}
+		
+		LOGS("--comparison--");
+		
+		if (strncmp(stored_hex_hash,curr_hex_hash,SHA512_HEX_DIGEST_LENGTH) != 0 ){
+			LOG(RED"ATTENTION: %s was modified!!"DEF,curr_path);
+		}else{
+			LOG(GREEN"%s not modified"DEF,curr_path);
+		}
+
+
+
+
+		res = get_dir_from_path(curr_path,curr_dir_only);
+		if (!res){
+			LOGE("could not get dir from path: %s",curr_path);
+			free(hash_file_buffer);
+			finalize();
+			return -1;
+		}
+		LOG("curr_dir_only: %s",curr_dir_only);
+		strncpy(paths_array[i].dir_path,curr_dir_only,PATH_MAX);
+		LOG("paths_array[i].dir_path: %s",paths_array[i].dir_path);
+		if (i < num_paths -1){
+			line_start = strstr(next_break+1,"/");
+			next_break = strstr(line_start,":");
+		}
+		i++;
+	}	
+	
+	free(hash_file_buffer);
+
+	
+}

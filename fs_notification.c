@@ -260,7 +260,7 @@ static int fill_with_paths(){
 		return -1;
 	}
 	
-	// go over all paths and get it's dir
+	// go over all paths and get their dir
 	line_start = hash_file_buffer;
 	next_break = strstr(line_start,":");
 	while( i < num_paths){ // in effect num lines
