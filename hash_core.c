@@ -18,7 +18,7 @@ unsigned char* hash_buffer(unsigned char* hash_dst,unsigned const char* buf, siz
 }
 //tested
 //returns the address of hash_dst contining the hash value of the contents of a file
-unsigned char* hash_a_file(unsigned char* hash_dst,const char* path){
+unsigned char* hash_a_file(const char* path,unsigned char* hash_dst){
 	char *file_contents = NULL;
 	size_t contents_len = 0;
 	
@@ -41,7 +41,7 @@ unsigned char* hash_a_file(unsigned char* hash_dst,const char* path){
 	return hash_dst;
 }
 // tested
-char* hash_a_file_as_hex(char* hex_hash_dst,const char* path){
+char* hash_a_file_as_hex(const char* path,char* hex_hash_dst){
 	unsigned char* res = NULL;
 	unsigned char temp_hash[SHA512_DIGEST_LENGTH] = {0};
 	if (!hex_hash_dst || ! path){
@@ -49,7 +49,7 @@ char* hash_a_file_as_hex(char* hex_hash_dst,const char* path){
 		return NULL;
 	}
 	
-	res = hash_a_file(temp_hash,path);
+	res = hash_a_file(path,temp_hash);
 	
 	if (!res){
 		LOGE("could not get initial hash, something terribly wrong has happened"); 
@@ -73,7 +73,7 @@ char* get_path_and_hash_line(const char* path,char* dst){
 	unsigned char original_hash[SHA512_DIGEST_LENGTH+1] = {0};
 	unsigned char hex_res[SHA512_HEX_DIGEST_LENGTH+1] = {0};
 	if (!path || !dst) return NULL;
-	rc = hash_a_file(original_hash,path);
+	rc = hash_a_file(path,original_hash);
 	if (rc != original_hash){
 		LOGE("hash_a_file() failed: %p, hex_res: %p\r\n",rc,original_hash);
 		return;
@@ -89,11 +89,12 @@ char* get_path_and_hash_line(const char* path,char* dst){
 	
 	snprintf(dst,strlen(path)+SHA512_HEX_DIGEST_LENGTH+4,"%s:%s\r\n",path,hex_res);
 	
+	/*
 	LOGS("dst: %s",dst,strlen(dst),strlen(path)+SHA512_HEX_DIGEST_LENGTH+4);
 	LOGS("calculated length: %d",strlen(path)+SHA512_HEX_DIGEST_LENGTH+4);
 	LOGS("strlen(dst): %d",strlen(dst));
 	LOGS("strlen(path): %d",strlen(path));
-	
+	*/
 	return dst;
 
 
@@ -136,6 +137,7 @@ int add_file_to_hash_list(const char* path){
 	}
 	
 	if (is_in_file(HASH_FILE_PATH,path)){
+		
 		LOGE("path already in file, will calculate hash anew");
 		
 		res = remove_path_from_hash_list(path);
@@ -155,7 +157,7 @@ int add_file_to_hash_list(const char* path){
 		return -1;	
 	}
 	
-	res = append_to_file(HASH_FILE_PATH,path,new_hash_line);
+	res = append_to_file(HASH_FILE_PATH,new_hash_line);
 	
 	if (res<0){
 		LOGE("append_to_file() failed\r\n");
@@ -294,7 +296,7 @@ int check_all_existing_hashes(){
 
 	if (num_paths == 0){
 		LOGE("no files to watch");
-		return -1;
+		return 0;
 	}else if (num_paths < 0){
 		LOGE("error getting paths");
 		return -1;
@@ -310,7 +312,8 @@ int check_all_existing_hashes(){
 	
 	
 	
-		// go over all paths and get their dir
+	// go over all paths and compare their current hash
+	// to stored hash
 	line_start = hash_file_buffer;
 	next_break = strstr(line_start,":");
 	while( i < num_paths){ // in effect num lines
@@ -321,12 +324,12 @@ int check_all_existing_hashes(){
 		LOG("curr_path: %s",curr_path);
 		strncpy(stored_hex_hash,next_break+1,SHA512_HEX_DIGEST_LENGTH);
 		LOG("it's stored hash: %s",stored_hex_hash);
-		rc = hash_a_file_as_hex(curr_hex_hash,curr_path);
+		res = hash_a_file_as_hex(curr_path,curr_hex_hash);
 
-		if (!rc){
+		if (!res){
 			LOGE("could not calculate hash as hex for: %s",curr_path);
 			free(hash_file_buffer);
-			return -1
+			return -1;
 		}
 		
 		LOGS("--comparison--");
@@ -337,27 +340,16 @@ int check_all_existing_hashes(){
 			LOG(GREEN"%s not modified"DEF,curr_path);
 		}
 
-
-
-
-		res = get_dir_from_path(curr_path,curr_dir_only);
-		if (!res){
-			LOGE("could not get dir from path: %s",curr_path);
-			free(hash_file_buffer);
-			finalize();
-			return -1;
-		}
-		LOG("curr_dir_only: %s",curr_dir_only);
-		strncpy(paths_array[i].dir_path,curr_dir_only,PATH_MAX);
-		LOG("paths_array[i].dir_path: %s",paths_array[i].dir_path);
 		if (i < num_paths -1){
 			line_start = strstr(next_break+1,"/");
 			next_break = strstr(line_start,":");
 		}
+
 		i++;
 	}	
 	
 	free(hash_file_buffer);
 
+	return 0;
 	
 }

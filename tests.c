@@ -9,7 +9,7 @@ void test(){
 	hash_buffer(hash,test,sizeof(test));
 	LOG("string:hash %s:%s\r\n",test,hash); 
 	memset(hash,0,SHA512_DIGEST_LENGTH);
-	hash_a_file(hash,TEST_FILE_1_PATH);
+	hash_a_file(TEST_FILE_1_PATH,hash);
 	LOG("%s:%s\r\n",TEST_FILE_1_PATH,hash); 
 	print_as_hex(hash,SHA512_DIGEST_LENGTH);
 	// TODO why the has is different every time? buffer too big? Note that only the tail of the hash differs
@@ -150,7 +150,7 @@ void test_hash_a_file(){
 	void* rc = NULL;
 	unsigned char original_hash[SHA512_DIGEST_LENGTH+1] = {0};
 	unsigned char hex_res[SHA512_HEX_DIGEST_LENGTH+1] = {0};
-	rc = hash_a_file(original_hash,TEST_FILE_1_PATH);
+	rc = hash_a_file(TEST_FILE_1_PATH,original_hash);
 	if (rc != original_hash){
 		LOG("hash_a_file() failed: %p, hex_res: %p\r\n",rc,original_hash);
 		return;
@@ -368,10 +368,10 @@ void test_hash_a_file_as_hex(){
 	char hex_hash_2[SHA512_HEX_DIGEST_LENGTH+1] = {0};
 	char hex_hash_3[SHA512_HEX_DIGEST_LENGTH+1] = {0};
 	char hex_hash_4[SHA512_HEX_DIGEST_LENGTH+1] = {0};
-	hash_a_file_as_hex(hex_hash_1,TEST_FILE_1_PATH);
-	hash_a_file_as_hex(hex_hash_2,TEST_FILE_2_PATH);
-	hash_a_file_as_hex(hex_hash_3,TEST_FILE_3_PATH);
-	hash_a_file_as_hex(hex_hash_4,TEST_FILE_4_PATH);
+	hash_a_file_as_hex(TEST_FILE_1_PATH,hex_hash_1);
+	hash_a_file_as_hex(TEST_FILE_2_PATH,hex_hash_2);
+	hash_a_file_as_hex(TEST_FILE_3_PATH,hex_hash_3);
+	hash_a_file_as_hex(TEST_FILE_4_PATH,hex_hash_4);
 	LOGS("%s",hex_hash_1);
 	LOGS("%s",hex_hash_2);
 	LOGS("%s",hex_hash_3);
@@ -383,8 +383,8 @@ void test_hash_a_file_as_hex(){
 	unsigned char temp_hash_short[SHA512_DIGEST_LENGTH] = {0};
 	unsigned char temp_hash_long[SHA512_DIGEST_LENGTH+1] = {0};
 	
-	hash_a_file(temp_hash_short,TEST_FILE_1_PATH);
-	hash_a_file(temp_hash_long,TEST_FILE_1_PATH);
+	hash_a_file(TEST_FILE_1_PATH,temp_hash_short);
+	hash_a_file(TEST_FILE_1_PATH,temp_hash_long);
 	
 	str_to_hex(temp_hash_short,SHA512_DIGEST_LENGTH,hex_hash_short);
 	str_to_hex(temp_hash_long,SHA512_DIGEST_LENGTH,hex_hash_long);
@@ -396,6 +396,47 @@ void test_hash_a_file_as_hex(){
 void test_finallize(){
 	stop_fs_notifications();
 }
+void test_check_all_existing_hashes(){
+	int res = 0;
+	reset_hash_file(); 
+	check_all_existing_hashes(); // test on empty hash file
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	check_all_existing_hashes(); // test on one file
+	reset_hash_file(); 
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	add_file_to_hash_list(TEST_FILE_3_PATH);
+	add_file_to_hash_list(TEST_FILE_4_PATH);
+	check_all_existing_hashes(); // test on few file
+	reset_hash_file(); 
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	write_to_file(TEST_FILE_1_PATH,"foo012983"); // change file after getting it's hash
+	check_all_existing_hashes(); // test on one file already changed
+	reset_hash_file(); 
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	add_file_to_hash_list(TEST_FILE_3_PATH);
+	add_file_to_hash_list(TEST_FILE_4_PATH);
+	write_to_file(TEST_FILE_3_PATH,"alsdkjf;lafkd"); // change file after getting it's hash
+	check_all_existing_hashes(); // test on one file already changed
+	reset_hash_file(); 
+	write_to_file(TEST_FILE_1_PATH,"1");
+	write_to_file(TEST_FILE_2_PATH,"2");
+	write_to_file(TEST_FILE_3_PATH,"3");
+	write_to_file(TEST_FILE_4_PATH,"4");
+	add_file_to_hash_list(TEST_FILE_1_PATH);
+	add_file_to_hash_list(TEST_FILE_2_PATH);
+	add_file_to_hash_list(TEST_FILE_3_PATH);
+	add_file_to_hash_list(TEST_FILE_4_PATH);
+	write_to_file(TEST_FILE_1_PATH,"11");
+	write_to_file(TEST_FILE_2_PATH,"22");
+	write_to_file(TEST_FILE_3_PATH,"33");
+	write_to_file(TEST_FILE_4_PATH,"44");
+	check_all_existing_hashes(); // test all files modified
+
+
+}
+
 void run_all_tests(){
 	//test_get_file();
 	//test_sha_basics();
@@ -407,16 +448,16 @@ void run_all_tests(){
 	//test_write_to_file();
 	//test_reset_hash_file();
 	//test_is_in_file();
-	test_add_file_to_hash_list_w_dups();
+	//test_add_file_to_hash_list_w_dups();
 	//test_get_hash_of_file_from_list();
 	//test_get_dir_from_path();
 	//test_is_path_in_hash_file();
 	//test_is_dir_path();
 	//test_logging_macro();
-	//test_hash_a_file_as_hex();
+	test_hash_a_file_as_hex();
 	//test_finallize();
 	//test_remove_path_from_hash_list();
-	
+	//test_check_all_existing_hashes();
 	//test_string_stuff();
 	//test_get_line_num_in_file();
 	//test_printf_anomaly();

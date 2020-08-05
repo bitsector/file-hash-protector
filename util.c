@@ -103,7 +103,7 @@ char* get_file(const char* file_path,size_t *len){
         return NULL;
     }
 
-    LOGS("got from fread: %d, file_size: %d,content_length: %d, allocated: %d\r\n",rc,file_size,strlen(buffer),sizeof(char)*(file_size+1));
+    //LOGS("got from fread: %d, file_size: %d,content_length: %d, allocated: %d\r\n",rc,file_size,strlen(buffer),sizeof(char)*(file_size+1));
 
     fclose(file_object);
     close(fd);
@@ -112,8 +112,8 @@ char* get_file(const char* file_path,size_t *len){
 
 }
 
-// TODO - works incorrectly
-int append_to_file(const char* append_to_path,const char* target_path,const char* data){
+// tested
+int append_to_file(const char* append_to_path,const char* data){
 	FILE* f_ptr = NULL;
 	size_t res = 0;
 	if (!append_to_path || !does_exist(append_to_path)){
@@ -140,11 +140,10 @@ int append_to_file(const char* append_to_path,const char* target_path,const char
     LOG("need to write: %d",strlen(target_path)+SHA512_HEX_DIGEST_LENGTH+4); 
     LOG("strlen(data): %d",strlen(data)); 
     LOG("data:%s",data);
-    */
-	//fwrite(data,strlen(target_path)+SHA512_HEX_DIGEST_LENGTH+4,1,f_ptr);
 	
 	LOGS("written: %d",res)
 	LOGS("written content: %s",data)
+    */
 	
 	fclose(f_ptr);
 	

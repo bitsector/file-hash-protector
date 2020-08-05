@@ -183,7 +183,7 @@ static int handle_event(struct inotify_event* event){
 			return -1;
 		}
 		
-		res = hash_a_file_as_hex(fresh_hash,entire_path);
+		res = hash_a_file_as_hex(entire_path,fresh_hash);
 		if (!res){
 			LOGE("could not calculate hash of %s contents, maybe we don't have access?");
 			return -1;
