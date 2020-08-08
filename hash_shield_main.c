@@ -61,7 +61,7 @@ void reset(){
 		printf("%s() failed\r\n",__func__);
 	}
 }
-// TODO - test this
+//tested
 static int check_hash_storage(){
 	int res = 0;
 	if (!does_exist(HASH_FILE_PATH)){
