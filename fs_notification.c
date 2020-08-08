@@ -22,7 +22,6 @@ struct wd_dir_pair{
 // an array containing all the paths of watched dir and their corresponding wds
 static struct wd_dir_pair* paths_array = NULL;
 
-// tested
 // free all allocated memory in fs_notification.c
 static void finalize(){
 	if (paths_array) {
@@ -39,13 +38,14 @@ static void finalize(){
 		inotify_fd = 0;
 	}
 }
-// tested
+
 // stop getting notifications form inotify mechanism
 void stop_fs_notifications(){
     LOG("stopping all inotify operations and releasing resources");
 	finalize();
 }
 
+// auxilary function that prints the specific inotify event mask
 static const char* get_exact_event_mask(unsigned int mask){
     switch(mask){
         case (IN_ACCESS):
@@ -123,8 +123,8 @@ static const char* get_exact_event_mask(unsigned int mask){
             return "unknown";
 
     };
-
 }
+// auxilary function: print the content of @event
 static void print_event(struct inotify_event *event){
     LOG("event:");
     LOG("watch: %d",event->wd);
@@ -134,6 +134,7 @@ static void print_event(struct inotify_event *event){
     LOG("name: %s",event->name);
 
 }
+// returns the dir path associated with the inotify watch @wd
 static char* dir_path_only(int wd){
 	int i=0;
 	while (i<num_watched_dirs){
@@ -145,7 +146,15 @@ static char* dir_path_only(int wd){
 	return NULL;
 }
 
-// TODO - test
+// core function:
+// for all the modified in @event:
+// 1. get the specific file and construct a full path
+// from dir+filename
+// 2. check if this full path is in hash storage (if the file is watched)
+// 3. if the file is watched then compare the stored hash and the current
+// hash
+// 4. if the hashes differ it's an indication that the file was modified
+// - in this case print an alert into stdout and syslog
 static int handle_event(struct inotify_event* event){
 	int i = 0;
 	char entire_path[PATH_MAX] = {0};
@@ -155,7 +164,7 @@ static int handle_event(struct inotify_event* event){
 	char* res = NULL;
 	
 	if (!event){
-		LOG( "event is NULL");
+		LOGE( "event is NULL");
 		return -1;
 	}
 	
@@ -208,8 +217,9 @@ static int handle_event(struct inotify_event* event){
 
 	return 0;
 }
-
-// TODO - test
+// checks if the event to see it's relevant (read events dont modify
+// files for example) and sends to handle_event() only the relevant
+// events
 static int parse_events(int length){
 	int i = 0;
 	while ( i < length ) {     
@@ -241,8 +251,8 @@ static int parse_events(int length){
 
 	return 0;
 }
-
-// TODO - test
+// for each path in hash storage create a watch in the 
+// inotify structure to keep an eye on changes in this path 
 static int fill_with_paths(){
 	size_t len = 0;
 	char curr_path[PATH_MAX] = {0};
@@ -288,7 +298,8 @@ static int fill_with_paths(){
 	free(hash_file_buffer);
 	return 0;
 }
-// TODO - test
+// initiates inotify structure with all the path in stored hashes file
+// so all the changes on these paths trigger an inotify notification 
 static int add_watches(){
 	int res = 0;
 	num_paths = get_line_num_in_file(HASH_FILE_PATH);
@@ -323,18 +334,13 @@ static int add_watches(){
 		LOG("path: %s, wd: %d",paths_array[i].dir_path,paths_array[i].wd);
 		num_watched_dirs++;
 	}
-	/*	
-	res = check_hashes_on_boot();
-	
-	if (res != 0){
-		LOG("boot hash check failed! some files must have chaned");
-	}
-	*/
+
 	LOGS("success! num_paths: %d, num_watched_dirs %d, allocated: %d",num_paths,num_watched_dirs,sizeof(struct wd_dir_pair)*num_paths);
 	return 0;
 }
 
-// TODO - test
+// inits and runs in in infinite loop a read from inotify fd
+// this is a core funcion of the mechanism
 int run_inotify(){
 	int event_length = 0;
 	int res = 0;

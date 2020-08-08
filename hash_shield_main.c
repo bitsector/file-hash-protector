@@ -9,18 +9,21 @@ static const char usage_str[] = " --help : display this message\r\n"
 								" --add-path <path>: stores current <path>'s hash value and keeps track of it's changes\r\n"
 								" 					 NOTE: if <path>'s hash is already stored - the hash value will be \r\n"
 								" 					 calculated anew and stored\r\n"
-								" --remove-path <path>: remove path from hash list\r\n" // TODO - test
+								" --remove-path <path>: remove path from hash list\r\n"
 								" --run-tests : run tests (THIS WILL DELETE ALL STORED HASHED CONTENT SO FAR!!)\r\n"
-								" --run-shield : start running hash_shield\r\n" // TODO - test
+								" --run-shield : start running hash_shield\r\n"
 								" --reset : clears all stored files paths and their hash values\r\n";
 
 
-
+// prints usage message
 void usage(){
 	printf("hash_shield usage: \r\n");
 	printf("%s\r\n",usage_str);
 
 }
+// add a path  designated by @path to hash storage file. 
+// if the file already exists it recalculates the hash anew
+// and overwrites the stored value
 void add_path(const char* path){
 	int res = 0;
 	printf("add_path: %s\r\n",path);
@@ -32,7 +35,8 @@ void add_path(const char* path){
 	}
 }
 
-// tested
+// removes path-hash pair from hash storage file designated by
+// @path
 void remove_path(const char* path){
 	int res = 0;
 	printf("remove_path: %s",path);
@@ -45,7 +49,7 @@ void remove_path(const char* path){
 
 }
 
-
+// start running an inotify service
 void start_shield(){
 
 	printf("start_shield: \r\n");
@@ -53,6 +57,7 @@ void start_shield(){
 	run_inotify();
 
 }
+// resets the hash storage file to be empty
 void reset(){
 	int res = reset_hash_file();
 	if (res == 0){

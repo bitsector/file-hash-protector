@@ -5,19 +5,19 @@
 #define DBG 1
 #endif
 
-// tested
-// empties the hash list file
+
+// reset hash storage file to be empty
 int reset_hash_file(){
-	// TODO - possibly a better solution is to write 0x05 EOF ascii
 	return write_to_file(HASH_FILE_PATH,"");
 }
-//tested
-//returns the address of hash_dst
+// generates a sha512 digest out of @buf of @len size
+// and writes it to @hash_dst
 unsigned char* hash_buffer(unsigned char* hash_dst,unsigned const char* buf, size_t len){
 	return SHA512(buf, len , hash_dst);
 }
-//tested
-//returns the address of hash_dst contining the hash value of the contents of a file
+// generates a hash digest into @hash_dst from the contents of the
+// file pointed by @path 
+// returns hex_hash_dst upon success or NULL in case of failure
 unsigned char* hash_a_file(const char* path,unsigned char* hash_dst){
 	char *file_contents = NULL;
 	size_t contents_len = 0;
@@ -40,7 +40,9 @@ unsigned char* hash_a_file(const char* path,unsigned char* hash_dst){
 	free(file_contents);
 	return hash_dst;
 }
-// tested
+// generates a hash digest in hex form into @hex_hash_dst from 
+// the file pointed by @path
+// returns hex_hash_dst upon success or NULL in case of failure
 char* hash_a_file_as_hex(const char* path,char* hex_hash_dst){
 	unsigned char* res = NULL;
 	unsigned char temp_hash[SHA512_DIGEST_LENGTH] = {0};
@@ -67,7 +69,11 @@ char* hash_a_file_as_hex(const char* path,char* hex_hash_dst){
 	
 	
 }
-// tested
+// generate a line of the form
+// <path>:<sha512 of file contents>\r\n
+// fomr the contents of the file pointed by @path into 
+// @dst
+// returns dst upon success or NULL in case of failure
 char* get_path_and_hash_line(const char* path,char* dst){
 	void* rc = NULL;
 	unsigned char original_hash[SHA512_DIGEST_LENGTH+1] = {0};
@@ -89,19 +95,12 @@ char* get_path_and_hash_line(const char* path,char* dst){
 	
 	snprintf(dst,strlen(path)+SHA512_HEX_DIGEST_LENGTH+4,"%s:%s\r\n",path,hex_res);
 	
-	/*
-	LOGS("dst: %s",dst,strlen(dst),strlen(path)+SHA512_HEX_DIGEST_LENGTH+4);
-	LOGS("calculated length: %d",strlen(path)+SHA512_HEX_DIGEST_LENGTH+4);
-	LOGS("strlen(dst): %d",strlen(dst));
-	LOGS("strlen(path): %d",strlen(path));
-	*/
 	return dst;
 
 
 }
 
-//tested
-// returns 1 if path is a file path in hash file
+// returns 1 if @path is in hash storage or 0 otherwise
 int is_path_in_hash_file(const char* path){
 	int ret = 0;
 	size_t len = 0;
@@ -125,8 +124,9 @@ int is_path_in_hash_file(const char* path){
 	return ret;
 	
 }
-// tested
-// adds a file path and it's hex-hash value to hash values file
+// adds a file pointed by @path and it's hex-hash value to hash 
+// storag file
+// returns 1 upon success or -1 in case of failure
 int add_file_to_hash_list(const char* path){
 	void* rc = 0;
 	int res = 0;
@@ -168,8 +168,9 @@ int add_file_to_hash_list(const char* path){
 
 	return 0;
 }
-// tested
-// gets the stored hash value of a file
+// retreives the hex hash digest associated with @path from hash
+// storage and writes it into @stored_hash
+// returns stored_hash upon success or NULL in case of failure
 unsigned char* get_hash_of_file_from_list(const char* path, unsigned char* stored_hash){
 	size_t len = 0;
 	char *hash_file_buffer = NULL;
@@ -216,7 +217,9 @@ unsigned char* get_hash_of_file_from_list(const char* path, unsigned char* store
 	return stored_hash;
 	
 }
-//tested
+// removes a path-has digest pairt from hash storage file
+// associated with @path
+// returns 1 upon success or 0 upon failure
 int remove_path_from_hash_list(const char* path){
 	size_t len = 0;
 	char* hash_file_buffer = NULL;
@@ -282,6 +285,11 @@ int remove_path_from_hash_list(const char* path){
 	return 0;
 	
 }
+// verifies that all currently watched files (all path-hash pairs 
+// in hash storage) have the same hash values when they were 
+// stored
+// when there is a hash mismatch for a file path a warning is sent 
+// into stdout and syslog 
 int check_all_existing_hashes(){
 	size_t len = 0;
 	int num_paths = 0;
@@ -355,7 +363,8 @@ int check_all_existing_hashes(){
 	return 0;
 	
 }
-//tested
+// returns 1 if the precise path in @path (no substring or a partial path)
+// is stored in the hash storage file or 0 otherwise
 int is_file_path_in_hash_file(const char* path){
 	size_t len = 0;
 	char* file_buff = NULL;
@@ -375,14 +384,6 @@ int is_file_path_in_hash_file(const char* path){
 
 	res = strstr(file_buff,path);
 
-	/*
-	LOGS("res: %d, NULL: %d",(int)res,(int)NULL);
-	LOGS("(res + strlen(path) < file_buff + len): %d",(res + strlen(path) < file_buff + len));
-	//LOGS("( res[strlen(path)] == ':'): %d",( res[strlen(path)] == ':'));
-	//LOGS("(res == file_buff): %d",(res == file_buff));
-	//LOGS("((res > file_buff) && (res[-1] == '\n')): %d",((res > file_buff) && (res[-1] == '\n')));
-	*/
-	
 	ret = (res != NULL) && (res + strlen(path) < file_buff + len -1 ) && ( res[strlen(path)] == ':') && ( res == file_buff || ((res > file_buff) && (res[-1] == '\n')) );
 	
 	free(file_buff);

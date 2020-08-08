@@ -497,6 +497,18 @@ void test_is_file_path_in_hash_file(){
 	
 	
 }
+void test_realpath(){
+	char real_path[PATH_MAX] = {0};
+	char* res = NULL;
+	res = realpath("~/mmn16/test_files/test_file_1",real_path);
+	if (res != real_path){
+		printf("res!=real_path, error: %s\r\n",strerror(errno));
+	}else{
+		printf("res==real_path\r\n");
+	}
+	printf("real_path: %s\r\n",real_path);
+	
+}
 void run_all_tests(){
 	//test_get_file();
 	//test_sha_basics();
@@ -517,7 +529,7 @@ void run_all_tests(){
 	//test_hash_a_file_as_hex();
 	//test_finallize();
 	//test_remove_path_from_hash_list();
-	test_check_all_existing_hashes();
+	//test_check_all_existing_hashes();
 	//test_string_stuff();
 	//test_get_line_num_in_file();
 	//test_printf_anomaly();
@@ -525,6 +537,7 @@ void run_all_tests(){
 	//test_syslog();
 	//test_does_exist();
 	//test_is_file_path_in_hash_file();
+	test_realpath();
 }
 
 

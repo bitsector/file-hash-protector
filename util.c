@@ -205,7 +205,9 @@ int is_in_file(const char* path,const char* needle){
 	
 }
 
-// tested
+// extracts only he directory path portion from @path and stores it in
+// @dir_only_path.
+// return @dir_only_path upon success of NULL upon failure 
 const char* get_dir_from_path(const char* path, char* dir_only_path){
 	DIR* dir = NULL;
 	char* p = NULL;
@@ -258,8 +260,8 @@ const char* get_dir_from_path(const char* path, char* dir_only_path){
     return NULL;
 	
 }
-//tested
-//return 1 if path is of a directory
+//return 1 if path is of a directory (and not of a file or some other 
+// file system entity)
 int is_dir_path(const char* path){
 	int res = 0;
 	DIR* dir = NULL;
@@ -277,6 +279,8 @@ int is_dir_path(const char* path){
 	return res;
 	
 }	
+// return the number of lines in a file pointed by @path
+// returns number of lines upon success or -1 upon failure
 int get_line_num_in_file(const char* path){
 	size_t len = 0;
 	int count = 0;
@@ -296,12 +300,10 @@ int get_line_num_in_file(const char* path){
 	}
 	
 	while (i < len){
-//		LOGS("%d:%d",i,(int)file_buffer[i]);
-		if (file_buffer[i] == '\n') { //TODO - error: for some odd reason \n (10 ascii) are not inserted
+		if (file_buffer[i] == '\n') {
 			count++;
 		}
 		i++;
-		
 	}
 	
 	free(file_buffer);
