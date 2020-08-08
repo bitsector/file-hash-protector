@@ -5,11 +5,12 @@
 #define DBG 1
 #endif
 
-// tested
+// returns 1 if the file at @path exists or 0 otherwise
 int does_exist(const char* path){
 	return access( path, F_OK ) != -1;
 }
-// tested
+// converts a binary string @src to hex equivalent in @dst
+// returns a pointer to @dst upon success or NULL for failure
 char* str_to_hex(const unsigned char* src,size_t len,char* dst){
 	if (!src || !dst) return NULL;
 	for (int i = 0, j = 0; i < len ; ++i, j += 2){
@@ -18,18 +19,8 @@ char* str_to_hex(const unsigned char* src,size_t len,char* dst){
 	
 	return dst;
 }
-// tested
-void print_as_hex(const unsigned char* str, size_t len){
-	void* rc = NULL;
-	char hex[SHA512_HEX_DIGEST_LENGTH] = {0};
-	rc = str_to_hex(str,SHA512_DIGEST_LENGTH,hex);
-	if (rc != hex){
-		LOGE("printing as hex failed\r\n");
-		return;
-	}
-	LOGS("\r\n'%s' in hex is \r\n%s\r\n", str, hex);
-}
-// tested
+// converts a hex style string in @src to regualr binatry string @dst
+// returns a pointer to @dst upon success or NULL on failure
 unsigned char* hex_to_str(const char* src, size_t len, unsigned char* dst){
 	if (!src || !dst) return NULL;
 	for (int i = 0, j = 0; j < len; ++i, j += 2) {
@@ -40,7 +31,21 @@ unsigned char* hex_to_str(const char* src, size_t len, unsigned char* dst){
 	}
 	return dst;
 }
-// tested
+// prints a string @str of length @len as hex
+void print_as_hex(const unsigned char* str, size_t len){
+	void* rc = NULL;
+	char hex[SHA512_HEX_DIGEST_LENGTH] = {0};
+	rc = str_to_hex(str,SHA512_DIGEST_LENGTH,hex);
+	if (rc != hex){
+		LOGE("printing as hex failed\r\n");
+		return;
+	}
+	LOGS("\r\n'%s' in hex is \r\n%s\r\n", str, hex);
+}
+/* returns a malloced buffer with the contents of the file in  
+* @file_path and sets @len to be the buffer's size.
+* The buffer must be freed when done using it
+*/
 char* get_file(const char* file_path,size_t *len){
     int fd,file_size,rc;
     char* buffer;
@@ -112,7 +117,9 @@ char* get_file(const char* file_path,size_t *len){
 
 }
 
-// tested
+// appendt to the file at @appent_to_path the contents 
+// of @data
+// returns 0 upon success or -1 upon failure
 int append_to_file(const char* append_to_path,const char* data){
 	FILE* f_ptr = NULL;
 	size_t res = 0;
@@ -131,26 +138,16 @@ int append_to_file(const char* append_to_path,const char* data){
     }
 	
     // Append data to file 
-    //fputs(data, f_ptr);
     res = fprintf(f_ptr,"%s", data);
-    /*
-    LOG("SHA512_HEX_DIGEST_LENGTH: %d",SHA512_HEX_DIGEST_LENGTH); 
-    LOG("strlen(target_path): %d",strlen(target_path)); 
-    LOG("target_path: %s",target_path); 
-    LOG("need to write: %d",strlen(target_path)+SHA512_HEX_DIGEST_LENGTH+4); 
-    LOG("strlen(data): %d",strlen(data)); 
-    LOG("data:%s",data);
-	
-	LOGS("written: %d",res)
-	LOGS("written content: %s",data)
-    */
-	
+ 	
 	fclose(f_ptr);
 	
 	return 0;
 }
 
-// tested
+// writes (overwrites!) the file at @path with the contents 
+// of @buffer.
+// returns 0 upons success or -1 upon failure
 int write_to_file(const char* path,const char* buffer){
 	FILE * fp;
 	int res = 0;
@@ -207,41 +204,7 @@ int is_in_file(const char* path,const char* needle){
 	return res;
 	
 }
-//tested
-int is_file_path_in_hash_file(const char* path){
-	size_t len = 0;
-	char* file_buff = NULL;
-	char* res = NULL;
-	int ret = 0;
-	if (!path || strncmp(path,"",2) == 0){
-		LOGE("invalid argument\r\n");
-		return 0;
-	}
 
-	file_buff = get_file(HASH_FILE_PATH,&len);
-
-	if (!file_buff){
-		LOGE("get_file() failed\r\n");
-		return 0;
-	}
-
-	res = strstr(file_buff,path);
-
-	/*
-	LOGS("res: %d, NULL: %d",(int)res,(int)NULL);
-	LOGS("(res + strlen(path) < file_buff + len): %d",(res + strlen(path) < file_buff + len));
-	//LOGS("( res[strlen(path)] == ':'): %d",( res[strlen(path)] == ':'));
-	//LOGS("(res == file_buff): %d",(res == file_buff));
-	//LOGS("((res > file_buff) && (res[-1] == '\n')): %d",((res > file_buff) && (res[-1] == '\n')));
-	*/
-	
-	ret = (res != NULL) && (res + strlen(path) < file_buff + len -1 ) && ( res[strlen(path)] == ':') && ( res == file_buff || ((res > file_buff) && (res[-1] == '\n')) );
-	
-	free(file_buff);
-	
-	return ret;
-	
-}
 // tested
 const char* get_dir_from_path(const char* path, char* dir_only_path){
 	DIR* dir = NULL;

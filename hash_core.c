@@ -138,7 +138,7 @@ int add_file_to_hash_list(const char* path){
 	
 	if (is_file_path_in_hash_file(path)){
 		
-		LOGS("path %s already in file, will calculate hash anew");
+		LOGS("path %s already in file, will calculate hash anew",path);
 		
 		res = remove_path_from_hash_list(path);
 		
@@ -353,5 +353,40 @@ int check_all_existing_hashes(){
 	free(hash_file_buffer);
 
 	return 0;
+	
+}
+//tested
+int is_file_path_in_hash_file(const char* path){
+	size_t len = 0;
+	char* file_buff = NULL;
+	char* res = NULL;
+	int ret = 0;
+	if (!path || strncmp(path,"",2) == 0){
+		LOGE("invalid argument\r\n");
+		return 0;
+	}
+
+	file_buff = get_file(HASH_FILE_PATH,&len);
+
+	if (!file_buff){
+		LOGE("get_file() failed\r\n");
+		return 0;
+	}
+
+	res = strstr(file_buff,path);
+
+	/*
+	LOGS("res: %d, NULL: %d",(int)res,(int)NULL);
+	LOGS("(res + strlen(path) < file_buff + len): %d",(res + strlen(path) < file_buff + len));
+	//LOGS("( res[strlen(path)] == ':'): %d",( res[strlen(path)] == ':'));
+	//LOGS("(res == file_buff): %d",(res == file_buff));
+	//LOGS("((res > file_buff) && (res[-1] == '\n')): %d",((res > file_buff) && (res[-1] == '\n')));
+	*/
+	
+	ret = (res != NULL) && (res + strlen(path) < file_buff + len -1 ) && ( res[strlen(path)] == ':') && ( res == file_buff || ((res > file_buff) && (res[-1] == '\n')) );
+	
+	free(file_buff);
+	
+	return ret;
 	
 }

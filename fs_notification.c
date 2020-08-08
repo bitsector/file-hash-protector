@@ -172,7 +172,7 @@ static int handle_event(struct inotify_event* event){
 	
 	LOGS("constructed path: %s",entire_path);
 	
-	if (is_in_file(HASH_FILE_PATH,entire_path)){
+	if (is_file_path_in_hash_file(entire_path)){
 		
 		// here compare hash of current file with the one in hash file
 		

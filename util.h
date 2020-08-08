@@ -13,5 +13,4 @@ const char* get_dir_from_path(const char* path, char* dir_only_path);
 int is_dir_path(const char* path);
 //int print_file(const char* path);
 int get_line_num_in_file(const char* path);
-int is_file_path_in_hash_file(const char* path);
 #endif  // HS_UTIL_H
