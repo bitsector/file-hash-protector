@@ -436,6 +436,14 @@ void test_check_all_existing_hashes(){
 
 
 }
+void test_syslog(){
+	syslog(LOG_WARNING,"hash shield hello\n");
+	LOGE("LOGE() test, did it worke?");
+	LOGS("LOGS() test, did it worke?");
+	LOG("LOG() test, did it worke?");
+	LOG_ATTENTION("ATTENTION:this should be in red");
+	LOG_OK("this should be in green");
+}	
 
 void run_all_tests(){
 	//test_get_file();
@@ -454,13 +462,16 @@ void run_all_tests(){
 	//test_is_path_in_hash_file();
 	//test_is_dir_path();
 	//test_logging_macro();
-	test_hash_a_file_as_hex();
+	//test_hash_a_file_as_hex();
 	//test_finallize();
 	//test_remove_path_from_hash_list();
 	//test_check_all_existing_hashes();
 	//test_string_stuff();
 	//test_get_line_num_in_file();
 	//test_printf_anomaly();
+	//test_get_line_num_in_file();
+	
+	test_syslog();
 }
 
 

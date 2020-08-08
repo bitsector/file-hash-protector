@@ -197,9 +197,9 @@ static int handle_event(struct inotify_event* event){
 		
 		
 		if (strncmp(stored_hash,fresh_hash,SHA512_HEX_DIGEST_LENGTH) != 0 ){
-			LOG(RED"ATTENTION: %s was modified!!"DEF,entire_path);
+			LOG_ATTENTION("ATTENTION: %s was modified!!",entire_path);
 		}else{
-			LOG(GREEN"%s not modified"DEF,entire_path);
+			LOG_OK("%s not modified",entire_path);
 		}
 		
 	}else{

@@ -279,37 +279,6 @@ int is_dir_path(const char* path){
 	return res;
 	
 }	
-/*
-// TODO - test this -- who's fault that it works badly?
-int print_file(const char* path){
-	size_t len = 0;
-	size_t res = 0;
-	char* file_buffer = NULL;
-
-	if (!path){
-		LOGE("invalid argument");
-		return -1;
-	}
-	
-	file_buffer = get_file(path,&len);
-	
-	if (!file_buffer){
-		LOGE("could not get file: %s",path);
-		return -1;
-	}
-	printf("file length: %d\r\n",len);
-	
-	res = printf("\r\n%s\r\n",file_buffer);
-	
-	printf("chars printed: %d\r\n",res);
-
-	free(file_buffer);
-	
-	return 0;
-}
-*/
-
-
 int get_line_num_in_file(const char* path){
 	size_t len = 0;
 	int count = 0;

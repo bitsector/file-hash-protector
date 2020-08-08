@@ -1,6 +1,9 @@
 #ifndef PRIVATE_LOG_H
 #define PRIVATE_LOG_H
 
+
+#include <syslog.h>
+
 #define BLACK "\033[30m"
 #define RED "\033[31m"
 #define GREEN "\033[32m"
@@ -24,13 +27,28 @@
 
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
 #define LOGE(...)  printf(ORANGE"%s"DEF":"RED" %s()"DEF":"BLUE" %d"DEF":", __FILENAME__,__func__,__LINE__  );\
 					printf(__VA_ARGS__); \
+					syslog(LOG_WARNING,__VA_ARGS__); \
 					printf("\r\n");
 					
 #define LOGS(...) if (DBG) { LOGE(__VA_ARGS__) }
+
 #define LOG(...) printf(__VA_ARGS__); \
+					syslog(LOG_WARNING,__VA_ARGS__); \
 					printf("\r\n");
 
+#define LOG_ATTENTION(...) printf(RED); \
+							printf(__VA_ARGS__); \
+							printf(DEF); \
+							syslog(LOG_WARNING,__VA_ARGS__); \
+							printf("\r\n");
+
+#define LOG_OK(...) printf(GREEN); \
+							printf(__VA_ARGS__); \
+							printf(DEF); \
+							syslog(LOG_WARNING,__VA_ARGS__); \
+							printf("\r\n");
 
 #endif  // PRIVATE_LOG

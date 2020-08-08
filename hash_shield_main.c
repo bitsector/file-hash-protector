@@ -71,6 +71,8 @@ int main(int argc, char* argv[]){
 		return -1;
 	}
 	
+	openlog("HASH-SHIELD",LOG_CONS | LOG_PID | LOG_NDELAY | LOG_NOWAIT, LOG_AUTH);
+	
 	if (argc == 2){
 		if (strncmp(argv[1],"--help",sizeof("--help")) == 0){
 			usage();
@@ -105,5 +107,7 @@ int main(int argc, char* argv[]){
 		printf("unknown option: %s\r\n", argv[1]);
 		usage();
 	}
+	
+	closelog();
 	return 0;
 }
