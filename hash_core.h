@@ -13,5 +13,6 @@ int add_file_to_hash_list(const char* path);
 unsigned char* get_hash_of_file_from_list(const char* path, unsigned char* stored_hash);
 char* hash_a_file_as_hex(const char* path,char* hex_hash_dst);
 int check_all_existing_hashes();
+int remove_path_from_hash_list(const char* path);
 
 #endif  // HASH_CORE_H

@@ -136,9 +136,9 @@ int add_file_to_hash_list(const char* path){
 		return -1;	
 	}
 	
-	if (is_in_file(HASH_FILE_PATH,path)){
+	if (is_file_path_in_hash_file(path)){
 		
-		LOGE("path already in file, will calculate hash anew");
+		LOGS("path %s already in file, will calculate hash anew");
 		
 		res = remove_path_from_hash_list(path);
 		
@@ -156,6 +156,8 @@ int add_file_to_hash_list(const char* path){
 		LOGE("get_path_and_hash_line() failed\r\n");
 		return -1;	
 	}
+	
+	LOGS("appending: %s",new_hash_line);
 	
 	res = append_to_file(HASH_FILE_PATH,new_hash_line);
 	
@@ -177,15 +179,15 @@ unsigned char* get_hash_of_file_from_list(const char* path, unsigned char* store
 		LOGE("invalid argument");
 		return NULL;
 	}
-	if (!is_in_file(HASH_FILE_PATH,path)){
-		LOGE("no hash entry stored for %s\r\n",path);
+	if (!is_file_path_in_hash_file(path)){
+		LOGE("no hash entry stored for %s",path);
 		return NULL;
 	}
 		
 	hash_file_buffer = get_file(HASH_FILE_PATH,&len);
 	
 	if (!hash_file_buffer){
-		LOGE("could not get hash file\r\n");
+		LOGE("could not get hash file");
 		return NULL;
 	}
 	
@@ -221,12 +223,12 @@ int remove_path_from_hash_list(const char* path){
 	char* new_file_buffer = NULL;
 	char* path_start = NULL;
 	size_t i = 0;
+	LOGE("started");
 	if (!path){
 		LOGE("invalid argument\r\n");
 		return -1;
 	}
-	
-	if (!is_in_file(HASH_FILE_PATH,path)){
+	if (!is_file_path_in_hash_file(path)){
 		LOGE("no hash entry stored for %s\r\n",path);
 		return -1;
 	}
@@ -335,9 +337,9 @@ int check_all_existing_hashes(){
 		LOGS("--comparison--");
 		
 		if (strncmp(stored_hex_hash,curr_hex_hash,SHA512_HEX_DIGEST_LENGTH) != 0 ){
-			LOG(RED"ATTENTION: %s was modified!!"DEF,curr_path);
+			LOG_ATTENTION("ATTENTION: %s was modified!!",curr_path);
 		}else{
-			LOG(GREEN"%s not modified"DEF,curr_path);
+			LOG_OK("%s not modified",curr_path);
 		}
 
 		if (i < num_paths -1){

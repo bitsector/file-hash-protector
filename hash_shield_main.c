@@ -6,9 +6,11 @@
 
 
 static const char usage_str[] = " --help : display this message\r\n"
-								" --add-path <path>: set or modify existing files hash\r\n"
+								" --add-path <path>: stores current <path>'s hash value and keeps track of it's changes\r\n"
+								" 					 NOTE: if <path>'s hash is already stored - the hash value will be \r\n"
+								" 					 calculated anew and stored\r\n"
 								" --remove-path <path>: remove path from hash list\r\n" // TODO - test
-								" --run-tests : run tests (THIS WILL DELETE ALL HASHED CONTENT SO FAR!!)\r\n"
+								" --run-tests : run tests (THIS WILL DELETE ALL STORED HASHED CONTENT SO FAR!!)\r\n"
 								" --run-shield : start running hash_shield\r\n" // TODO - test
 								" --reset : clears all stored files paths and their hash values\r\n";
 
@@ -30,9 +32,16 @@ void add_path(const char* path){
 	}
 }
 
-// TODO - test
-void remove_path(){
-	printf("remove_path: \r\n");
+// tested
+void remove_path(const char* path){
+	int res = 0;
+	printf("remove_path: %s",path);
+	res = remove_path_from_hash_list(path);
+	if (res < 0){
+		printf("remove_path: %s - failed\r\n",path);
+	}else{
+		printf("remove_path: %s - success\r\n",path);
+	}
 
 }
 
@@ -97,7 +106,7 @@ int main(int argc, char* argv[]){
 		if (strncmp(argv[1],"--add-path",sizeof("--add-path")) == 0){
 			add_path(argv[2]);
 		}else if (strncmp(argv[1],"--remove-path",sizeof("--remove-path")) == 0){
-			remove_path();
+			remove_path(argv[2]);
 		}else{
 			printf("unknown option: %s\r\n", argv[1]);
 			usage();

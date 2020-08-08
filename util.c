@@ -207,6 +207,41 @@ int is_in_file(const char* path,const char* needle){
 	return res;
 	
 }
+//tested
+int is_file_path_in_hash_file(const char* path){
+	size_t len = 0;
+	char* file_buff = NULL;
+	char* res = NULL;
+	int ret = 0;
+	if (!path || strncmp(path,"",2) == 0){
+		LOGE("invalid argument\r\n");
+		return 0;
+	}
+
+	file_buff = get_file(HASH_FILE_PATH,&len);
+
+	if (!file_buff){
+		LOGE("get_file() failed\r\n");
+		return 0;
+	}
+
+	res = strstr(file_buff,path);
+
+	/*
+	LOGS("res: %d, NULL: %d",(int)res,(int)NULL);
+	LOGS("(res + strlen(path) < file_buff + len): %d",(res + strlen(path) < file_buff + len));
+	//LOGS("( res[strlen(path)] == ':'): %d",( res[strlen(path)] == ':'));
+	//LOGS("(res == file_buff): %d",(res == file_buff));
+	//LOGS("((res > file_buff) && (res[-1] == '\n')): %d",((res > file_buff) && (res[-1] == '\n')));
+	*/
+	
+	ret = (res != NULL) && (res + strlen(path) < file_buff + len -1 ) && ( res[strlen(path)] == ':') && ( res == file_buff || ((res > file_buff) && (res[-1] == '\n')) );
+	
+	free(file_buff);
+	
+	return ret;
+	
+}
 // tested
 const char* get_dir_from_path(const char* path, char* dir_only_path){
 	DIR* dir = NULL;
