@@ -1,0 +1,8 @@
+[Unit]
+Description=Hash Shield Startup
+
+[Service]
+ExecStart=/usr/local/bin/hash_shield_main --run-shield
+
+[Install]
+WantedBy=multi-user.target
