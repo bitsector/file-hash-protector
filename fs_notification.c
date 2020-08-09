@@ -225,7 +225,7 @@ static int parse_events(int length){
 	while ( i < length ) {     
 		struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
 		if ( event->len ) {
-			print_event(event);
+			//print_event(event);
 			if ( event->mask & IN_MODIFY ) {
 				if ( event->mask & IN_ISDIR ) {
 					LOG( "event is IN_MODIFY on dir");
@@ -234,15 +234,12 @@ static int parse_events(int length){
 					handle_event(event);
 				}
 			}else if ( event->mask & IN_DELETE ) {
-				// TODO - what should happen if a dir or a file
-				// are deleted?
-				// Should I norify about that and that's it?
+				// TODO - maybe handle this as well
 				if ( event->mask & IN_ISDIR ) {
 					LOG( "event is IN_MODIFY on dir" );
 				}
 				else {
 					LOG( "event is IN_MODIFY on dir" );
-					
 				}
 			}
 		}
