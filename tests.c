@@ -20,9 +20,9 @@ void test(){
 }
 void test_printf_anomaly(){
 	size_t res = 0;
-	char str[]="/home/ak/mmn16/test_files/test_file_4:"
+	char str[]="/home/ak/mmn/test_files/test_file_4:"
 				"8ac7093018144d2b0ecfae74b87a659dae19879912f5c67d9d62cd0f88475951cf353f949c32afe116f8a5c66ec69a54da94beb5334d98ed53505f5976d31c7a"
-				"/home/ak/mmn16/test_files/test_file_3:"
+				"/home/ak/mmn/test_files/test_file_3:"
 				"c0a9078aa8d1194bbd92896491a3921b21920cd9efe11db8832d1140c3ced700232810748810265dbacb20d61b9ba8f4f26c65b68d661481ee9ea13598a9dbbd";
 
 	printf("sizeof(str): %d\r\n",sizeof(str));
@@ -238,9 +238,9 @@ void test_get_dir_from_path(){
 	char dir_path[PATH_MAX] = {0};
 	res = get_dir_from_path(TEST_FILE_1_PATH,dir_path);
 	printf("res: %p, final result: %s\r\n",res,dir_path);
-	res = get_dir_from_path("/home/ak/mmn16/test_files/",dir_path);
+	res = get_dir_from_path("/home/ak/mmn/test_files/",dir_path);
 	printf("res: %p, final result: %s\r\n",res,dir_path);
-	res = get_dir_from_path("/home/ak/mmn16/test_files",dir_path);
+	res = get_dir_from_path("/home/ak/mmn/test_files",dir_path);
 	printf("res: %p, final result: %s\r\n",res,dir_path);
 }
 void test_is_path_in_hash_file(){
@@ -255,16 +255,16 @@ void test_is_path_in_hash_file(){
 	printf("is_path_in_hash_file(TEST_FILE_4_PATH): %d\r\n",is_path_in_hash_file(TEST_FILE_4_PATH));
 	//printf("is_path_in_hash_file(\"\"): %d\r\n",is_path_in_hash_file(""));
 	printf("is_path_in_hash_file(\"1234\"): %d\r\n",is_path_in_hash_file("1234"));
-	printf("is_path_in_hash_file(\"/home/ak/mmn16/test_files\"): %d\r\n",is_path_in_hash_file("/home/ak/mmn16/test_files"));
+	printf("is_path_in_hash_file(\"/home/ak/mmn/test_files\"): %d\r\n",is_path_in_hash_file("/home/ak/mmn/test_files"));
 }
 void test_is_dir_path(){
 	printf("is_dir_path(\"\"): %d\r\n",is_dir_path(""));
-	printf("is_dir_path(\"/home/ak/mmn16/test_files/\"): %d\r\n",is_dir_path("/home/ak/mmn16/test_files/"));
-	printf("is_dir_path(\"/home/ak/mmn16/test_files\"): %d\r\n",is_dir_path("/home/ak/mmn16/test_files"));
+	printf("is_dir_path(\"/home/ak/mmn/test_files/\"): %d\r\n",is_dir_path("/home/ak/mmn/test_files/"));
+	printf("is_dir_path(\"/home/ak/mmn/test_files\"): %d\r\n",is_dir_path("/home/ak/mmn/test_files"));
 	printf("is_dir_path(\"/home\"): %d\r\n",is_dir_path("/home"));
 	printf("is_dir_path(\"/home/\"): %d\r\n",is_dir_path("/home/"));
 	printf("is_dir_path(\"/\"): %d\r\n",is_dir_path("/"));
-	printf("is_dir_path(\"/home/ak/mmn16/test_files/test_file_2\"): %d\r\n",is_dir_path("/home/ak/mmn16/test_files/test_file_2"));
+	printf("is_dir_path(\"/home/ak/mmn/test_files/test_file_2\"): %d\r\n",is_dir_path("/home/ak/mmn/test_files/test_file_2"));
 	printf("is_dir_path(\"/foo\"): %d\r\n",is_dir_path("/foo"));
 	printf("is_dir_path(\"/foo/\"): %d\r\n",is_dir_path("/foo/"));
 	
@@ -444,9 +444,9 @@ void test_syslog(){
 	LOG_OK("this should be in green");
 }	
 void test_does_exist(){
-	printf("does_exist(\"/home/ak/mmn16/test_files\"): %d",does_exist("/home/ak/mmn16/test_files"));
-	printf("does_exist(\"/home/ak/mmn16/test_files/\"): %d",does_exist("/home/ak/mmn16/test_files/"));
-	printf("does_exist(\"/home/ak/mmn16/test_files/test_file_1\"): %d",does_exist("/home/ak/mmn16/test_files/test_file_1"));
+	printf("does_exist(\"/home/ak/mmn/test_files\"): %d",does_exist("/home/ak/mmn/test_files"));
+	printf("does_exist(\"/home/ak/mmn/test_files/\"): %d",does_exist("/home/ak/mmn/test_files/"));
+	printf("does_exist(\"/home/ak/mmn/test_files/test_file_1\"): %d",does_exist("/home/ak/mmn/test_files/test_file_1"));
 
 
 }
@@ -458,8 +458,8 @@ void test_is_file_path_in_hash_file(){
 	printf("is_file_path_in_hash_file(\"test_file_1\"): %d",is_file_path_in_hash_file("test_file_1"));
 	printf("is_file_path_in_hash_file(\"test_files/test_file_1\"): %d",is_file_path_in_hash_file("test_files/test_file_1"));
 	printf("is_file_path_in_hash_file(\"test_files\"): %d",is_file_path_in_hash_file("test_files"));
-	printf("is_file_path_in_hash_file(\"/home/ak/mmn16/test_files\"): %d",is_file_path_in_hash_file("/home/ak/mmn16/test_files"));
-	printf("is_file_path_in_hash_file(\"/home/ak/mmn16/test_files/test_file_1\"): %d",is_file_path_in_hash_file("/home/ak/mmn16/test_files/test_file_1"));
+	printf("is_file_path_in_hash_file(\"/home/ak/mmn/test_files\"): %d",is_file_path_in_hash_file("/home/ak/mmn/test_files"));
+	printf("is_file_path_in_hash_file(\"/home/ak/mmn/test_files/test_file_1\"): %d",is_file_path_in_hash_file("/home/ak/mmn/test_files/test_file_1"));
 	printf("is_file_path_in_hash_file(\"foo\"): %d",is_file_path_in_hash_file("foo"));
 	reset_hash_file(); 
 	add_file_to_hash_list(TEST_FILE_1_PATH); // search in first line
@@ -469,8 +469,8 @@ void test_is_file_path_in_hash_file(){
 	printf("is_file_path_in_hash_file(\"test_file_1\"): %d",is_file_path_in_hash_file("test_file_1"));
 	printf("is_file_path_in_hash_file(\"test_files/test_file_1\"): %d",is_file_path_in_hash_file("test_files/test_file_1"));
 	printf("is_file_path_in_hash_file(\"test_files\"): %d",is_file_path_in_hash_file("test_files"));
-	printf("is_file_path_in_hash_file(\"/home/ak/mmn16/test_files\"): %d",is_file_path_in_hash_file("/home/ak/mmn16/test_files"));
-	printf("is_file_path_in_hash_file(\"/home/ak/mmn16/test_files/test_file_1\"): %d",is_file_path_in_hash_file("/home/ak/mmn16/test_files/test_file_1"));
+	printf("is_file_path_in_hash_file(\"/home/ak/mmn/test_files\"): %d",is_file_path_in_hash_file("/home/ak/mmn/test_files"));
+	printf("is_file_path_in_hash_file(\"/home/ak/mmn/test_files/test_file_1\"): %d",is_file_path_in_hash_file("/home/ak/mmn/test_files/test_file_1"));
 	printf("is_file_path_in_hash_file(\"foo\"): %d",is_file_path_in_hash_file("foo"));
 	reset_hash_file(); 
 	add_file_to_hash_list(TEST_FILE_2_PATH);
@@ -480,8 +480,8 @@ void test_is_file_path_in_hash_file(){
 	printf("is_file_path_in_hash_file(\"test_file_1\"): %d",is_file_path_in_hash_file("test_file_1"));
 	printf("is_file_path_in_hash_file(\"test_files/test_file_1\"): %d",is_file_path_in_hash_file("test_files/test_file_1"));
 	printf("is_file_path_in_hash_file(\"test_files\"): %d",is_file_path_in_hash_file("test_files"));
-	printf("is_file_path_in_hash_file(\"/home/ak/mmn16/test_files\"): %d",is_file_path_in_hash_file("/home/ak/mmn16/test_files"));
-	printf("is_file_path_in_hash_file(\"/home/ak/mmn16/test_files/test_file_1\"): %d",is_file_path_in_hash_file("/home/ak/mmn16/test_files/test_file_1"));
+	printf("is_file_path_in_hash_file(\"/home/ak/mmn/test_files\"): %d",is_file_path_in_hash_file("/home/ak/mmn/test_files"));
+	printf("is_file_path_in_hash_file(\"/home/ak/mmn/test_files/test_file_1\"): %d",is_file_path_in_hash_file("/home/ak/mmn/test_files/test_file_1"));
 	printf("is_file_path_in_hash_file(\"foo\"): %d",is_file_path_in_hash_file("foo"));
 	reset_hash_file(); 
 	add_file_to_hash_list(TEST_FILE_2_PATH);
@@ -491,8 +491,8 @@ void test_is_file_path_in_hash_file(){
 	printf("is_file_path_in_hash_file(\"test_file_1\"): %d",is_file_path_in_hash_file("test_file_1"));
 	printf("is_file_path_in_hash_file(\"test_files/test_file_1\"): %d",is_file_path_in_hash_file("test_files/test_file_1"));
 	printf("is_file_path_in_hash_file(\"test_files\"): %d",is_file_path_in_hash_file("test_files"));
-	printf("is_file_path_in_hash_file(\"/home/ak/mmn16/test_files\"): %d",is_file_path_in_hash_file("/home/ak/mmn16/test_files"));
-	printf("is_file_path_in_hash_file(\"/home/ak/mmn16/test_files/test_file_1\"): %d",is_file_path_in_hash_file("/home/ak/mmn16/test_files/test_file_1"));
+	printf("is_file_path_in_hash_file(\"/home/ak/mmn/test_files\"): %d",is_file_path_in_hash_file("/home/ak/mmn/test_files"));
+	printf("is_file_path_in_hash_file(\"/home/ak/mmn/test_files/test_file_1\"): %d",is_file_path_in_hash_file("/home/ak/mmn/test_files/test_file_1"));
 	printf("is_file_path_in_hash_file(\"foo\"): %d",is_file_path_in_hash_file("foo"));
 	
 	
@@ -500,7 +500,7 @@ void test_is_file_path_in_hash_file(){
 void test_realpath(){
 	char real_path[PATH_MAX] = {0};
 	char* res = NULL;
-	res = realpath("~/mmn16/test_files/test_file_1",real_path);
+	res = realpath("~/mmn/test_files/test_file_1",real_path);
 	if (res != real_path){
 		printf("res!=real_path, error: %s\r\n",strerror(errno));
 	}else{
