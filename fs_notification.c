@@ -1,5 +1,10 @@
 #include "fs_notification.h"
 
+#ifdef DBG
+#undef DBG
+#define DBG 0
+#endif
+
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 
 #define EVENT_BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
@@ -41,7 +46,7 @@ static void finalize(){
 
 // stop getting notifications form inotify mechanism
 void stop_fs_notifications(){
-    LOG("stopping all inotify operations and releasing resources");
+    LOGS("stopping all inotify operations and releasing resources");
 	finalize();
 }
 
@@ -126,12 +131,12 @@ static const char* get_exact_event_mask(unsigned int mask){
 }
 // auxilary function: print the content of @event
 static void print_event(struct inotify_event *event){
-    LOG("event:");
-    LOG("watch: %d",event->wd);
-    LOG("mask: %d = %s",event->mask,get_exact_event_mask(event->mask));
-    LOG("cookie: %d",event->cookie);
-    LOG("len: %d",event->len);
-    LOG("name: %s",event->name);
+    LOGS("event:");
+    LOGS("watch: %d",event->wd);
+    LOGS("mask: %d = %s",event->mask,get_exact_event_mask(event->mask));
+    LOGS("cookie: %d",event->cookie);
+    LOGS("len: %d",event->len);
+    LOGS("name: %s",event->name);
 
 }
 // returns the dir path associated with the inotify watch @wd
@@ -228,18 +233,18 @@ static int parse_events(int length){
 			//print_event(event);
 			if ( event->mask & IN_MODIFY ) {
 				if ( event->mask & IN_ISDIR ) {
-					LOG( "event is IN_MODIFY on dir");
+					LOGS( "event is IN_MODIFY on dir");
 				}else {
-					LOG( "event is IN_MODIFY on file");
+					LOGS( "event is IN_MODIFY on file");
 					handle_event(event);
 				}
 			}else if ( event->mask & IN_DELETE ) {
 				// TODO - maybe handle this as well
 				if ( event->mask & IN_ISDIR ) {
-					LOG( "event is IN_MODIFY on dir" );
+					LOGS( "event is IN_MODIFY on dir" );
 				}
 				else {
-					LOG( "event is IN_MODIFY on dir" );
+					LOGS( "event is IN_MODIFY on dir" );
 				}
 			}
 		}
@@ -274,7 +279,7 @@ static int fill_with_paths(){
 		memset(curr_path,0,sizeof(curr_path));
 		memset(curr_dir_only,0,sizeof(curr_dir_only));
 		strncpy(curr_path,line_start,next_break-line_start);
-		LOG("curr_path: %s",curr_path);
+		LOGS("curr_path: %s",curr_path);
 		res = get_dir_from_path(curr_path,curr_dir_only);
 		if (!res){
 			LOGE("could not get dir from path: %s",curr_path);
@@ -282,9 +287,9 @@ static int fill_with_paths(){
 			finalize();
 			return -1;
 		}
-		LOG("curr_dir_only: %s",curr_dir_only);
+		LOGS("curr_dir_only: %s",curr_dir_only);
 		strncpy(paths_array[i].dir_path,curr_dir_only,PATH_MAX);
-		LOG("paths_array[i].dir_path: %s",paths_array[i].dir_path);
+		LOGS("paths_array[i].dir_path: %s",paths_array[i].dir_path);
 		if (i < num_paths -1){
 			line_start = strstr(next_break+1,"/");
 			next_break = strstr(line_start,":");
@@ -298,7 +303,6 @@ static int fill_with_paths(){
 // initiates inotify structure with all the path in stored hashes file
 // so all the changes on these paths trigger an inotify notification 
 static int add_watches(){
-	int res = 0;
 	num_paths = get_line_num_in_file(HASH_FILE_PATH);
 
 	if (num_paths == 0){
@@ -309,7 +313,7 @@ static int add_watches(){
 		return -1;
 	}
 
-	paths_array = (char*)malloc(	sizeof(struct wd_dir_pair)*num_paths);
+	paths_array = (struct wd_dir_pair*)malloc(sizeof(struct wd_dir_pair)*num_paths);
 	
 	if (!paths_array){
 		LOGE("malloc failed, out of memory");
@@ -328,11 +332,11 @@ static int add_watches(){
 			finalize();
 			return -1;
 		}
-		LOG("path: %s, wd: %d",paths_array[i].dir_path,paths_array[i].wd);
+		LOGS("path: %s, wd: %d",paths_array[i].dir_path,paths_array[i].wd);
 		num_watched_dirs++;
 	}
 
-	LOGS("success! num_paths: %d, num_watched_dirs %d, allocated: %d",num_paths,num_watched_dirs,sizeof(struct wd_dir_pair)*num_paths);
+	LOG("success! watched paths: %d in %d directories",num_paths,num_watched_dirs);
 	return 0;
 }
 

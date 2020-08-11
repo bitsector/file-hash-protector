@@ -2,7 +2,7 @@
 
 #ifdef DBG
 #undef DBG
-#define DBG 1
+#define DBG 0
 #endif
 
 
@@ -157,7 +157,7 @@ int add_file_to_hash_list(const char* path){
 		return -1;	
 	}
 	
-	LOGS("appending: %s",new_hash_line);
+	//LOGS("appending: %s",new_hash_line);
 	
 	res = append_to_file(HASH_FILE_PATH,new_hash_line);
 	
@@ -258,10 +258,11 @@ int remove_path_from_hash_list(const char* path){
 		free(hash_file_buffer);
 		return -1;
 	}
+	/*
 	LOGS("new_file_buffer allocation size: %d, times sizeof: %d",
 		(len - (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4)),
 		sizeof(char)*(len - (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4)));
-		
+	*/	
 	memset(new_file_buffer,0,sizeof(char)*(len - (strlen(path) + SHA512_HEX_DIGEST_LENGTH + 4)+1));
 	
 	while (hash_file_buffer + i < path_start){
@@ -274,9 +275,11 @@ int remove_path_from_hash_list(const char* path){
 		i++;
 	};
 	
+	/*
 	LOGS("old file:\r\n%s\r\n",hash_file_buffer);
 	LOGS("new file:\r\n%s\r\n",new_file_buffer);
-
+	*/
+	
 	write_to_file(HASH_FILE_PATH,new_file_buffer);
 	
 	free(new_file_buffer);
@@ -331,9 +334,9 @@ int check_all_existing_hashes(){
 		memset(stored_hex_hash,0,sizeof(stored_hex_hash));
 		memset(curr_hex_hash,0,sizeof(curr_hex_hash));
 		strncpy(curr_path,line_start,next_break-line_start);
-		LOG("curr_path: %s",curr_path);
+		LOGS("curr_path: %s",curr_path);
 		strncpy(stored_hex_hash,next_break+1,SHA512_HEX_DIGEST_LENGTH);
-		LOG("it's stored hash: %s",stored_hex_hash);
+		LOGS("it's stored hash: %s",stored_hex_hash);
 		res = hash_a_file_as_hex(curr_path,curr_hex_hash);
 
 		if (!res){

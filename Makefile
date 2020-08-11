@@ -1,4 +1,4 @@
-CC=gcc -std=c99 -Wall -fstack-protector -g
+CC=gcc -std=c99 -Wall -fstack-protector
 CFLAGS=-I.
 DEPS = hash_shield.h tests.h
 CLIBS=-lssl -lcrypto

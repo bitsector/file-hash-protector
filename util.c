@@ -2,7 +2,7 @@
 
 #ifdef DBG
 #undef DBG
-#define DBG 1
+#define DBG 0
 #endif
 
 // returns 1 if the file at @path exists or 0 otherwise
@@ -62,7 +62,7 @@ char* get_file(const char* file_path,size_t *len){
       LOGE("fstat() error: not standard file: %d, %s\r\n",errno,strerror(errno));
       return NULL;
     }
-    file_object = fdopen(fd, "r");
+    file_object = (FILE*)fdopen(fd, "r");
     if (file_object == NULL) {
       close(fd);
       LOGE("fdopen() error: %d, %s\r\n",errno,strerror(errno));
@@ -73,7 +73,7 @@ char* get_file(const char* file_path,size_t *len){
       fclose(file_object);
       close(fd);
       LOGE("fseeko() error: %d, %s\r\n",errno,strerror(errno));
-      return -1;
+      return NULL;
     }
 
     file_size = ftello(file_object);
@@ -122,7 +122,6 @@ char* get_file(const char* file_path,size_t *len){
 // returns 0 upon success or -1 upon failure
 int append_to_file(const char* append_to_path,const char* data){
 	FILE* f_ptr = NULL;
-	size_t res = 0;
 	if (!append_to_path || !does_exist(append_to_path)){
 		LOGE("invalid path: %s\r\n", append_to_path);
 		return -1;	
@@ -138,7 +137,7 @@ int append_to_file(const char* append_to_path,const char* data){
     }
 	
     // Append data to file 
-    res = fprintf(f_ptr,"%s", data);
+    fprintf(f_ptr,"%s", data);
  	
 	fclose(f_ptr);
 	
@@ -208,7 +207,7 @@ int is_in_file(const char* path,const char* needle){
 // extracts only he directory path portion from @path and stores it in
 // @dir_only_path.
 // return @dir_only_path upon success of NULL upon failure 
-const char* get_dir_from_path(const char* path, char* dir_only_path){
+char* get_dir_from_path(const char* path, char* dir_only_path){
 	DIR* dir = NULL;
 	char* p = NULL;
 	size_t i = 0;
@@ -228,7 +227,7 @@ const char* get_dir_from_path(const char* path, char* dir_only_path){
 	dir = NULL;
 	
 	p = path+strlen(path)-1;
-	LOGS("*p is %c\r\n",*p);
+	//LOGS("*p is %c\r\n",*p);
 	while (p>=path && *p != '/') p--;
 	while (p>path){
 		dir_only_path[i] = *path;
@@ -236,7 +235,7 @@ const char* get_dir_from_path(const char* path, char* dir_only_path){
 		i++;
 	}
 	
-	LOGE("dir path is: %s, will try to open\r\n",dir_only_path);
+	LOGS("dir path is: %s, will try to open\r\n",dir_only_path);
 	dir = opendir(dir_only_path);
 
     if (dir == NULL){
@@ -250,7 +249,7 @@ const char* get_dir_from_path(const char* path, char* dir_only_path){
 
 	}else{
 
-		LOGE("dir %s verified\r\n",dir_only_path);
+		LOGS("dir %s verified\r\n",dir_only_path);
 		closedir(dir);
 		return dir_only_path;
     }
