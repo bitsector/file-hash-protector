@@ -1,4 +1,2 @@
 *.o
-test_files/*
-more_test_files/*
 hash_shield_main
